@@ -16,7 +16,8 @@ class bagFlipModule:
 
     BAG_CAMERA_TOPIC  = rospy.get_param("bag_flip_detection/bag_camera_topic")
     TEST_CAMERA_TOPIC = rospy.get_param("bag_flip_detection/test_camera_topic")
-    SERVO_TOPIC       = rospy.get_param("bag_flip_detection/servo_topic")
+    BAG_POS_TOPIC     = rospy.get_param("bag_flip_detection/bag_pos_topic")
+    #SERVO_TOPIC       = rospy.get_param("bag_flip_detection/servo_topic")
     
     CLOSE_ANGLE       = rospy.get_param("bag_flip_detection/close_angle")
     OPEN_ANGLE        = rospy.get_param("bag_flip_detection/open_angle")
@@ -48,15 +49,23 @@ class bagFlipModule:
 	    big_contours = [i for i in contours if cv2.contourArea(i) > self.AREA]
 	    sorted_contours = sorted(big_contours, key = lambda x: cv2.contourArea(x), reverse=True)
 	    cv2.drawContours(cv_image, [sorted_contours[0]], -1, (0, 255, 0), 3)
-	    top = False
-	    bot = False
 	    if big_contours:
+		center = cv_image.size[1]/2
+     		top = False
+	    	bot = False
 		for contour in big_contours:
 		    x, y, w, h = cv2.boundingRect(contour)
-		    if x > self.bot_zone[0][0] and (x+w) < self.bot_zone[1][0] and y > self.bot_zone[0][1] and (y+h) < self.bot_zone[1][1]:
-			bot = True 
-		    if x > self.top_zone[0][0] and (x+w) < self.top_zone[1][0] and y > self.top_zone[0][1] and (y+h) < self.top_zone[1][1]:
-			top = True
+		    if self.SIDE * (x - center) > 0 or self.SIDE * ((x+w) - center) > 0:
+			bot_x_diff = (x+(w/2)) - ((self.bot_zone[0][0] + self.bot_zone[1][0])/2)
+			bot_y_diff = (y+(h/2)) - ((self.bot_zone[0][1] + self.bot_zone[1][1])/2)
+			top_x_diff = (x+(w/2)) - ((self.top_zone[0][0] + self.top_zone[1][0])/2)
+			top_y_diff = (y+(h/2)) - ((self.top_zone[0][1] + self.top_zone[1][1])/2)
+ 
+		        if bot_x_diff < abs(w/2) and bot_y_diff < abs(h/2):
+			    bot = True
+			if top_x_diff < abs(w/2) and top_y_diff < abs(h/2);
+			    top - True
+		#PUBLISH HERE
 
 
 	self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
@@ -67,7 +76,8 @@ class bagFlipModule:
         # subscribers here
 	self.bag_camera_sub = rospy.Subscriber(self.BAG_CAMERA_TOPIC, Image, callback = self.react_to_zed)
 	self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
-	self.servo_pub = rospy.Publisher(self.SERVO_TOPIC, UInt16, queue_size=10)
+	self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, Image, queue_size=10)
+	#self.servo_pub = rospy.Publisher(self.SERVO_TOPIC, UInt16, queue_size=10)
 	self.bridge = CvBridge()
 	
 	if self.SIDE == 1:
