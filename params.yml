@@ -1,0 +1,17 @@
+bag_camera_topic: "/flip_camera/image_bag_raw"
+test_camera_topic: "/flip_camera/test"
+servo_topic: "/bag_flipper/servo"
+
+close_angle: 175
+open_angle: 10
+
+lower_color_range: [0,174,174]
+upper_color_range: [42,255,255]
+contour_area: 500
+
+tr: [(1200, 160), (1500, 480)]
+tl: [(200 , 160), (500 , 480)]
+br: [(1200, 600), (1500, 920)]
+bl: [(200 , 600), (500 , 920)]
+
+side: 1.0
