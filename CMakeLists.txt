@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(bag_flip_detection)
+project(bag_detection)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -110,7 +110,7 @@ find_package( OpenCV 4 REQUIRED )
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES bag_flip_detection
+#  LIBRARIES bag_detection
    CATKIN_DEPENDS rospy roscpp std_msgs message_runtime cv_bridge sensor_msgs
 #  DEPENDS system_lib
 )
@@ -128,7 +128,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/bag_flip_detection.cpp
+#   src/${PROJECT_NAME}/bag_detection.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -199,7 +199,7 @@ target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIE
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_bag_flip_detection.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_bag_detection.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

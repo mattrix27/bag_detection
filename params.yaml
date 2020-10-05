@@ -1,0 +1,18 @@
+bag_camera_topic: "/flip_camera/image_bag_raw"
+test_camera_topic: "/flip_camera/test"
+bag_pos_topic: "/boat_controller/bag_pos"
+servo_topic: "/bag_flipper/servo"
+
+close_angle: 175
+open_angle: 10
+
+lower_color_range: [140,130,60]
+upper_color_range: [190,255,255]
+contour_area: 250
+
+tr: [[400, 40 ], [560, 200]]
+tl: [[0  , 40 ], [80 , 200]]
+br: [[400, 280], [560, 440]]
+bl: [[0  , 280], [80 , 440]]
+
+side: 1.0
