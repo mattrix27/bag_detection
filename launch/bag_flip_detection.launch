@@ -1,6 +1,0 @@
-<launch>
-  <!-- Launch the wall follower with parameters -->
-  <node pkg="bag_flip_detection" name="bag_flip_detection" type="bag_detection.py" output="screen">
-    <rosparam command="load" file="$(find bag_flip_detection)/params.yaml"/>
-  </node>
-</launch>
