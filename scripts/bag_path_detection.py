@@ -26,7 +26,21 @@ class bagFlipModule:
 
     SIDE              = rospy.get_param("bag_detection/side")
 
-    def react_to_zed(self, data):
+    def __init__(self):
+        # Initialize your publishers and
+        # subscribers here
+        self.bag_camera_sub = rospy.Subscriber(self.BAG_CAMERA_TOPIC, Image, callback = self.react_to_camera)
+        self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
+        self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, PathPos, queue_size=10)
+
+        self.bridge = CvBridge()
+        self.h_matrix, self.status = self.makeHomography()
+
+        print(self.top_zone)
+        print(type(self.top_zone[0][0]))
+
+
+    def react_to_camera(self, data):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
@@ -35,27 +49,27 @@ class bagFlipModule:
         rectangles = sorted(util.get_contours(cv_image, self.LOWER_COLOR, self.UPPER_COLOR, self.AREA), key=lambda x: x[1], reversed=True)
 
         if len(rectangles) > 0:
-            bag_msg = PathPos()
+            point_rect = None
             for rect in rectangles:
-                bag_msg.x = rect[0]
-                bag_msg.y = rect[1]
+                point_rect = rect
 
+	    bag_msg = self.get_relative_pos(point_rect)
             self.bag_pos_pub.publish(bag_msg)
 
         self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
+
     
+    def get_relative_pos(self, rect):
+        bag_msg = PathPos()
+        bag_msg.x = rect[0]
+        bag_msg.y = rect[1]
+	return bag_msg
 
-    def __init__(self):
-        # Initialize your publishers and
-        # subscribers here
-        self.bag_camera_sub = rospy.Subscriber(self.BAG_CAMERA_TOPIC, Image, callback = self.react_to_zed)
-        self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
-        self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, PathPos, queue_size=10)
-        self.bridge = CvBridge()
 
-        print(self.top_zone)
-        print(type(self.top_zone[0][0]))
+    def makeHomography(self):
+	return 1
         
+
 if __name__ == "__main__":
     rospy.init_node('bagFlipModule')
     zedModule = bagFlipModule()

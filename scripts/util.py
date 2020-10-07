@@ -53,6 +53,6 @@ def create_flip_pos_msg(top=False, bot=False):
     msg.top_x = float('inf')
     msg.top_y = float('inf')
     msg.bot_x = float('inf')
-    msg.bot_Y = float('inf')
+    msg.bot_y = float('inf')
 
     return msg
