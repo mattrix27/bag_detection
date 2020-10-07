@@ -54,9 +54,9 @@ find_package( OpenCV 4 REQUIRED )
 
 ## Generate messages in the 'msg' folder
 # add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
+   FILES
+   FlipPos.msg
+   PathPos.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -74,10 +74,10 @@ find_package( OpenCV 4 REQUIRED )
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -109,10 +109,10 @@ find_package( OpenCV 4 REQUIRED )
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES bag_detection
-   CATKIN_DEPENDS rospy roscpp std_msgs message_runtime cv_bridge sensor_msgs
-#  DEPENDS system_lib
+ INCLUDE_DIRS include
+ LIBRARIES bag_detection
+ CATKIN_DEPENDS rospy roscpp std_msgs message_runtime cv_bridge sensor_msgs
+# DEPENDS system_lib
 )
 
 ###########
