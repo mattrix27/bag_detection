@@ -19,6 +19,7 @@ class bagFlipModule:
     BAG_CAMERA_TOPIC  = rospy.get_param("bag_detection/flip_camera_topic")
     TEST_CAMERA_TOPIC = rospy.get_param("bag_detection/test_flip_camera_topic")
     BAG_POS_TOPIC     = rospy.get_param("bag_detection/flip_pos_topic")
+    MODE_TOPIC        = rospy.get_param("bag_detection/mode")
 
     LOWER_COLOR       = rospy.get_param("bag_detection/lower_color_range")
     UPPER_COLOR       = rospy.get_param("bag_detection/upper_color_range")
@@ -34,6 +35,19 @@ class bagFlipModule:
 
     SIDE              = rospy.get_param("bag_detection/side")
 
+    MODE              = 0
+
+    def __init__(self):
+        # Initialize your publishers and
+        # subscribers here
+        self.bag_camera_sub = rospy.Subscriber(self.BAG_CAMERA_TOPIC, Image, callback=self.react_to_camera)
+        self.mode_sub = rospy.Subscriber(self.MODE_TOPIC, UInt16, callback=self.update_mode)
+        self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
+        self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, FlipPos, queue_size=10)
+        self.bridge = CvBridge()
+        
+        print(self.top_zone)
+        print(type(self.top_zone[0][0]))
 
     def update_bag_message(self, bag_msg, rect):
         x, y, w, h = rect
@@ -55,6 +69,15 @@ class bagFlipModule:
         return bag_msg
 
 
+    def get_bag_message(self, rectangles):
+        bag_msg = util.create_flip_pos_msg()
+        for rect in rectangles:
+            cv2.rectangle(cropped_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
+            #cv2.rectangle(red_only, (x,y), (x+w, y+h), (255,0,0), 2)
+            bag_msg = self.update_bag_message(bag_msg, rect)
+        return bag_msg
+
+
     def react_to_camera(self, data):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
@@ -65,33 +88,38 @@ class bagFlipModule:
         # mask = cv2.inRange(hsv, np.array(self.LOWER_COLOR), np.array(self.UPPER_COLOR))
         # red_only = cv2.bitwise_and(hsv,hsv,mask = mask)
         
-	center=cv_image.shape[1]/2
-        if self.SIDE > 0:
-            cropped_image = cv_image[:,:center]
-        else:
+	    center=cv_image.shape[1]/2
+        if (self.SIDE > 0) ^ (self.MODE != 1):
             cropped_image = cv_image[:,center:]
-
+            self.bot_zone = self.BR
+            self.top_zone = self.TR
+        else:
+            cropped_image = cv_image[:,:center]
+            self.bot_zone = self.BL
+            self.top_zone = self.TL
+            
         rectangles = util.get_rectangles(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR, self.AREA)
+
+        if len(rectangles) > 0:
+            bag_msg = self.get_bag_message(rectangles)
+     
+            if abs(bag_msg.bot_x) < ((self.bot_zone[1][0]-self.bot_zone[0][0])/2) and abs(bag_msg.bot_y) < ((self.bot_zone[1][1]-self.bot_zone[0][1])/2):
+                bag_msg.bot = True
+            if abs(bag_msg.top_x) < ((self.top_zone[1][0]-self.top_zone[0][0])/2) and abs(bag_msg.top_y) < ((self.top_zone[1][1]-self.top_zone[0][1])/2):
+                bag_msg.top = True
+
+            self.bag_pos_pub.publish(bag_msg)
+
+
+        #FOR VIEWING
 
         top_color = (0,0,255)
         bot_color = (0,0,255)
         green = (0,255,0)
-        if len(rectangles) > 0:
-            bag_msg = util.create_flip_pos_msg()
-            for rect in rectangles:
-                cv2.rectangle(cropped_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
-                #cv2.rectangle(red_only, (x,y), (x+w, y+h), (255,0,0), 2)
-                bag_msg = self.update_bag_message(bag_msg, rect)
-     
-            if abs(bag_msg.bot_x) < ((self.bot_zone[1][0]-self.bot_zone[0][0])/2) and abs(bag_msg.bot_y) < ((self.bot_zone[1][1]-self.bot_zone[0][1])/2):
-                bag_msg.bot = True
-                bot_color = green
-            if abs(bag_msg.top_x) < ((self.top_zone[1][0]-self.top_zone[0][0])/2) and abs(bag_msg.top_y) < ((self.top_zone[1][1]-self.top_zone[0][1])/2):
-                bag_msg.top = True
-                top_color = green
-
-            self.bag_pos_pub.publish(bag_msg)
-
+        if bag_msg.top:
+            top_color = green
+        if bag_msg.bot:
+            bot_color = green
         cv2.rectangle(cropped_image, tuple(self.bot_zone[0]), tuple(self.bot_zone[1]), bot_color, 3)
         cv2.rectangle(cropped_image, tuple(self.top_zone[0]), tuple(self.top_zone[1]), top_color, 3)
 
@@ -101,22 +129,9 @@ class bagFlipModule:
         self.image_pub.publish(self.bridge.cv2_to_imgmsg(cropped_image, encoding="passthrough"))
 
 
-    def __init__(self):
-        # Initialize your publishers and
-        # subscribers here
-        self.bag_camera_sub = rospy.Subscriber(self.BAG_CAMERA_TOPIC, Image, callback = self.react_to_camera)
-        self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
-        self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, FlipPos, queue_size=10)
-        self.bridge = CvBridge()
-        
-        if self.SIDE == 1:
-            self.top_zone = self.TR
-            self.bot_zone = self.BR
-        else:
-            self.top_zone = self.TL
-            self.bot_zone = self.BL
-        print(self.top_zone)
-        print(type(self.top_zone[0][0]))
+    def update_mode(self, data):
+        self.MODE = data
+
     
 if __name__ == "__main__":
     rospy.init_node('bagFlipModule')
