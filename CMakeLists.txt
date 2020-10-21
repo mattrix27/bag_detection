@@ -109,7 +109,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- #INCLUDE_DIRS include
+# INCLUDE_DIRS include
  LIBRARIES bag_detection
  CATKIN_DEPENDS rospy roscpp std_msgs message_runtime cv_bridge sensor_msgs
 # DEPENDS system_lib
@@ -142,7 +142,7 @@ include_directories(
 add_executable(${PROJECT_NAME}_node src/bag_flip_detection_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-## add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

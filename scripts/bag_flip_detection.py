@@ -19,7 +19,7 @@ class bagFlipModule:
     BAG_CAMERA_TOPIC  = rospy.get_param("bag_detection/flip_camera_topic")
     TEST_CAMERA_TOPIC = rospy.get_param("bag_detection/test_flip_camera_topic")
     BAG_POS_TOPIC     = rospy.get_param("bag_detection/flip_pos_topic")
-    MODE_TOPIC        = rospy.get_param("bag_detection/mode")
+    MODE_TOPIC        = rospy.get_param("bag_detection/mode_topic")
 
     LOWER_COLOR       = rospy.get_param("bag_detection/lower_color_range")
     UPPER_COLOR       = rospy.get_param("bag_detection/upper_color_range")
@@ -45,9 +45,7 @@ class bagFlipModule:
         self.image_pub = rospy.Publisher(self.TEST_CAMERA_TOPIC, Image, queue_size=10)
         self.bag_pos_pub = rospy.Publisher(self.BAG_POS_TOPIC, FlipPos, queue_size=10)
         self.bridge = CvBridge()
-        
-        print(self.top_zone)
-        print(type(self.top_zone[0][0]))
+
 
     def update_bag_message(self, bag_msg, rect):
         x, y, w, h = rect
@@ -69,11 +67,11 @@ class bagFlipModule:
         return bag_msg
 
 
-    def get_bag_message(self, rectangles):
+    def get_bag_message(self, rectangles, cv_image=None):
         bag_msg = util.create_flip_pos_msg()
         for rect in rectangles:
-            cv2.rectangle(cropped_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
-            #cv2.rectangle(red_only, (x,y), (x+w, y+h), (255,0,0), 2)
+	    if type(cv_image) != type(None):
+            	cv2.rectangle(cv_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
             bag_msg = self.update_bag_message(bag_msg, rect)
         return bag_msg
 
@@ -88,8 +86,8 @@ class bagFlipModule:
         # mask = cv2.inRange(hsv, np.array(self.LOWER_COLOR), np.array(self.UPPER_COLOR))
         # red_only = cv2.bitwise_and(hsv,hsv,mask = mask)
         
-	    center=cv_image.shape[1]/2
-        if (self.SIDE > 0) ^ (self.MODE != 1):
+	center=cv_image.shape[1]/2
+        if (self.SIDE > 0) ^ (self.MODE != 2):
             cropped_image = cv_image[:,center:]
             self.bot_zone = self.BR
             self.top_zone = self.TR
@@ -99,15 +97,16 @@ class bagFlipModule:
             self.top_zone = self.TL
             
         rectangles = util.get_rectangles(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR, self.AREA)
-
+		
+	bag_msg = None
         if len(rectangles) > 0:
-            bag_msg = self.get_bag_message(rectangles)
+            bag_msg = self.get_bag_message(rectangles, cropped_image)
      
             if abs(bag_msg.bot_x) < ((self.bot_zone[1][0]-self.bot_zone[0][0])/2) and abs(bag_msg.bot_y) < ((self.bot_zone[1][1]-self.bot_zone[0][1])/2):
                 bag_msg.bot = True
             if abs(bag_msg.top_x) < ((self.top_zone[1][0]-self.top_zone[0][0])/2) and abs(bag_msg.top_y) < ((self.top_zone[1][1]-self.top_zone[0][1])/2):
                 bag_msg.top = True
-
+            #print("AHHHH")
             self.bag_pos_pub.publish(bag_msg)
 
 
@@ -116,10 +115,12 @@ class bagFlipModule:
         top_color = (0,0,255)
         bot_color = (0,0,255)
         green = (0,255,0)
-        if bag_msg.top:
-            top_color = green
-        if bag_msg.bot:
-            bot_color = green
+	
+        if bag_msg:
+            if bag_msg.top:
+                top_color = green
+            if bag_msg.bot:
+                bot_color = green
         cv2.rectangle(cropped_image, tuple(self.bot_zone[0]), tuple(self.bot_zone[1]), bot_color, 3)
         cv2.rectangle(cropped_image, tuple(self.top_zone[0]), tuple(self.top_zone[1]), top_color, 3)
 
@@ -130,7 +131,8 @@ class bagFlipModule:
 
 
     def update_mode(self, data):
-        self.MODE = data
+	print("UPDATE MODE: ", data)
+        self.MODE = data.data
 
     
 if __name__ == "__main__":

@@ -4,10 +4,12 @@ test_flip_camera_topic: "/flip_camera/test"
 path_camera_topic: "/path_camera/image_bag_raw"
 test_path_camera_topic: "/path_camera/test"
 
-flip_pos_topic: "/boat_controller/flip_pos"
-path_pos_topic: "/boat_controller/path_pos"
+flip_pos_topic: "/boat_controller/flip/flip_pos"
+path_pos_topic: "/boat_controller/path/path_pos"
 
-lower_color_range: [140,130,60]
+mode_topic: "/boat_controller/mode"
+
+lower_color_range: [140,120,60]
 upper_color_range: [190,255,255]
 flip_area: 250
 
