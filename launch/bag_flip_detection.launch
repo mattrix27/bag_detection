@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find jetson_camera)/launch/jetson_camera.launch" />
+  <node pkg="bag_detection" name="bag_flip_detection" type="bag_flip_detection.py" output="screen">
+    <rosparam command="load" file="$(find bag_detection)/params.yaml"/>
+  </node>
+</launch>

@@ -16,24 +16,24 @@ from cv2 import RANSAC
 
 class bagFlipModule:
 
-    BAG_CAMERA_TOPIC  = rospy.get_param("bag_detection/flip_camera_topic")
-    TEST_CAMERA_TOPIC = rospy.get_param("bag_detection/test_flip_camera_topic")
-    BAG_POS_TOPIC     = rospy.get_param("bag_detection/flip_pos_topic")
-    MODE_TOPIC        = rospy.get_param("bag_detection/mode_topic")
+    BAG_CAMERA_TOPIC  = rospy.get_param("bag_flip_detection/flip_camera_topic")
+    TEST_CAMERA_TOPIC = rospy.get_param("bag_flip_detection/test_flip_camera_topic")
+    BAG_POS_TOPIC     = rospy.get_param("bag_flip_detection/flip_pos_topic")
+    MODE_TOPIC        = rospy.get_param("bag_flip_detection/mode_topic")
 
-    LOWER_COLOR       = rospy.get_param("bag_detection/lower_color_range")
-    UPPER_COLOR       = rospy.get_param("bag_detection/upper_color_range")
-    AREA              = rospy.get_param("bag_detection/flip_area")
+    LOWER_COLOR       = rospy.get_param("bag_flip_detection/lower_color_range")
+    UPPER_COLOR       = rospy.get_param("bag_flip_detection/upper_color_range")
+    AREA              = rospy.get_param("bag_flip_detection/flip_area")
 
-    TR                = rospy.get_param("bag_detection/tr")
-    TL                = rospy.get_param("bag_detection/tl")
-    BR                = rospy.get_param("bag_detection/br")
-    BL                = rospy.get_param("bag_detection/bl")
+    TR                = rospy.get_param("bag_flip_detection/tr")
+    TL                = rospy.get_param("bag_flip_detection/tl")
+    BR                = rospy.get_param("bag_flip_detection/br")
+    BL                = rospy.get_param("bag_flip_detection/bl")
 
-    WIDTH             = rospy.get_param("bag_detection/width")
-    HEIGHT            = rospy.get_param("bag_detection/height")
+    WIDTH             = rospy.get_param("bag_flip_detection/width")
+    HEIGHT            = rospy.get_param("bag_flip_detection/height")
 
-    SIDE              = rospy.get_param("bag_detection/side")
+    SIDE              = rospy.get_param("bag_flip_detection/side")
 
     MODE              = 0
 
@@ -131,11 +131,11 @@ class bagFlipModule:
 
 
     def update_mode(self, data):
-    print("UPDATE MODE: ", data)
+        print("UPDATE MODE: ", data)
         self.MODE = data.data
 
     
 if __name__ == "__main__":
     rospy.init_node('bagFlipModule')
-    zedModule = bagFlipModule()
+    flipModule = bagFlipModule()
     rospy.spin()
