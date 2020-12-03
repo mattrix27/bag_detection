@@ -16,24 +16,24 @@ from cv2 import RANSAC
 
 class bagFlipModule:
 
-    BAG_CAMERA_TOPIC  = rospy.get_param("bag_detection/flip_camera_topic")
-    TEST_CAMERA_TOPIC = rospy.get_param("bag_detection/test_flip_camera_topic")
-    BAG_POS_TOPIC     = rospy.get_param("bag_detection/flip_pos_topic")
-    MODE_TOPIC        = rospy.get_param("bag_detection/mode_topic")
+    BAG_CAMERA_TOPIC  = rospy.get_param("bag_flip_detection/flip_camera_topic")
+    TEST_CAMERA_TOPIC = rospy.get_param("bag_flip_detection/test_flip_camera_topic")
+    BAG_POS_TOPIC     = rospy.get_param("bag_flip_detection/flip_pos_topic")
+    MODE_TOPIC        = rospy.get_param("bag_flip_detection/mode_topic")
 
-    LOWER_COLOR       = rospy.get_param("bag_detection/lower_color_range")
-    UPPER_COLOR       = rospy.get_param("bag_detection/upper_color_range")
-    AREA              = rospy.get_param("bag_detection/flip_area")
+    LOWER_COLOR       = rospy.get_param("bag_flip_detection/lower_color_range")
+    UPPER_COLOR       = rospy.get_param("bag_flip_detection/upper_color_range")
+    AREA              = rospy.get_param("bag_flip_detection/flip_area")
 
-    TR                = rospy.get_param("bag_detection/tr")
-    TL                = rospy.get_param("bag_detection/tl")
-    BR                = rospy.get_param("bag_detection/br")
-    BL                = rospy.get_param("bag_detection/bl")
+    TR                = rospy.get_param("bag_flip_detection/tr")
+    TL                = rospy.get_param("bag_flip_detection/tl")
+    BR                = rospy.get_param("bag_flip_detection/br")
+    BL                = rospy.get_param("bag_flip_detection/bl")
 
-    WIDTH             = rospy.get_param("bag_detection/width")
-    HEIGHT            = rospy.get_param("bag_detection/height")
+    WIDTH             = rospy.get_param("bag_flip_detection/width")
+    HEIGHT            = rospy.get_param("bag_flip_detection/height")
 
-    SIDE              = rospy.get_param("bag_detection/side")
+    SIDE              = rospy.get_param("bag_flip_detection/side")
 
     MODE              = 0
 
@@ -70,8 +70,8 @@ class bagFlipModule:
     def get_bag_message(self, rectangles, cv_image=None):
         bag_msg = util.create_flip_pos_msg()
         for rect in rectangles:
-	    if type(cv_image) != type(None):
-            	cv2.rectangle(cv_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
+            if type(cv_image) != type(None):
+                cv2.rectangle(cv_image, (rect[0],rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 2)
             bag_msg = self.update_bag_message(bag_msg, rect)
         return bag_msg
 
@@ -86,7 +86,7 @@ class bagFlipModule:
         # mask = cv2.inRange(hsv, np.array(self.LOWER_COLOR), np.array(self.UPPER_COLOR))
         # red_only = cv2.bitwise_and(hsv,hsv,mask = mask)
         
-	center=cv_image.shape[1]/2
+        center=cv_image.shape[1]/2
         if (self.SIDE > 0) ^ (self.MODE != 2):
             cropped_image = cv_image[:,center:]
             self.bot_zone = self.BR
@@ -97,8 +97,8 @@ class bagFlipModule:
             self.top_zone = self.TL
             
         rectangles = util.get_rectangles(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR, self.AREA)
-		
-	bag_msg = None
+        
+        bag_msg = None
         if len(rectangles) > 0:
             bag_msg = self.get_bag_message(rectangles, cropped_image)
      
@@ -115,7 +115,7 @@ class bagFlipModule:
         top_color = (0,0,255)
         bot_color = (0,0,255)
         green = (0,255,0)
-	
+    
         if bag_msg:
             if bag_msg.top:
                 top_color = green
@@ -131,11 +131,11 @@ class bagFlipModule:
 
 
     def update_mode(self, data):
-	print("UPDATE MODE: ", data)
+        print("UPDATE MODE: ", data)
         self.MODE = data.data
 
     
 if __name__ == "__main__":
     rospy.init_node('bagFlipModule')
-    zedModule = bagFlipModule()
+    flipModule = bagFlipModule()
     rospy.spin()

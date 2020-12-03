@@ -1,5 +1,4 @@
 <launch>
-  <node pkg="bag_detection" name="bag_detection" type="bag_flip_detection.py" output="screen">
-    <rosparam command="load" file="$(find bag_detection)/params.yaml"/>
-  </node>
+  <include file="$(find bag_detection)/launch/bag_flip_detection.launch" />
+  <include file="$(find bag_detection)/launch/bag_path_detection.launch" />
 </launch>
