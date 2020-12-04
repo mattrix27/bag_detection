@@ -1,7 +1,8 @@
 flip_camera_topic: "/flip_camera/image_bag_raw"
 test_flip_camera_topic: "/flip_camera/test"
 
-path_camera_topic: "/zed/zed_node/stereo/image_rect_color"
+path_rgb_camera_topic: "/zed/zed_node/stereo/image_rect_color"
+path_depth_camera_topic: "/zed/zed_node/
 test_path_camera_topic: "/path_camera/test"
 
 flip_pos_topic: "/boat_controller/flip/flip_pos"
