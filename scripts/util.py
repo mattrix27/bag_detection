@@ -2,10 +2,12 @@
 
 import numpy as np
 import cv2
+import tensorflow as tf
 
 from bag_detection.msg import FlipPos, PathPos
 
-def get_rectangles(cv_image, lower_range, upper_range, threshold_area):
+
+def get_rectangles(mask, threshold_area):
     """
     Extract defined color from image and return rectangles coordinates of large enough contours on given side
     Input: 
@@ -17,8 +19,6 @@ def get_rectangles(cv_image, lower_range, upper_range, threshold_area):
     Output:
         list of 1x4 tuples (x, y, w, h) of color blobs 
     """
-    hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, np.array(lower_range), np.array(upper_range))
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
     rectangles = []
@@ -28,7 +28,8 @@ def get_rectangles(cv_image, lower_range, upper_range, threshold_area):
             rectangles.append(rect)
     return rectangles
 
-def get_contours(cv_image, lower_range, upper_range, threshold_area):
+
+def get_contours(mask, threshold_area):
     """
     Extract defined color from image and return large contours (UNUSED)
     Input: 
@@ -39,8 +40,6 @@ def get_contours(cv_image, lower_range, upper_range, threshold_area):
     Output:
         list of openCV contours 
     """
-    hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, np.array(lower_range), np.array(upper_range))
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
     return [x for x in contours if cv2.contourArea(x) > threshold_area], hierarchy
@@ -104,6 +103,43 @@ def get_region_box(smask, area=100, side='bottom', image=None):
     if image:
         cv.rectangle(image, (box[0], box[1]), (box[0]+box[2], box[1]+box[3]), (0,0,255), 2)
     return box
+
+
+def get_tf2_detect_fn(path):
+    detect_fn=tf.saved_model.load(path)
+    return detect_fn
+
+
+def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5)
+    image_np = np.array(image)
+    input_tensor=tf.convert_to_tensor(image_np)
+    input_tensor=input_tensor[tf.newaxis, ...]
+    detections=detect_fn(input_tensor)
+    print(type(detections))
+
+    # This is the way I'm getting my coordinates
+    boxes = detections['detection_boxes'][0]
+    # print(boxes)
+    # get all boxes from an array
+    max_boxes_to_draw = boxes.shape[0]
+    # get scores to get a threshold
+    scores = detections['detection_scores'][0]
+    # print(scores)
+    # this is set as a default but feel free to adjust it to your needs
+  
+    # iterate over all objects found
+    objects = []
+    for i in range(min(max_boxes_to_draw, boxes.shape[0])): 
+        if scores is None or scores[i] > min_score_thresh:
+            class_name = detections['detection_classes'][0][i].numpy()
+
+            y_min, x_min, y_max, x_max = boxes[i].numpy()
+            tl, br = ((int(x_min*width), int(y_min*height)), (int(x_max*width), int(y_max*height)))
+            detection = {'class':class_name, 'box': (tl, br)}
+            objects.append(detection)
+
+    return objects
+
 
 def create_flip_pos_msg(top=False, bot=False):
 

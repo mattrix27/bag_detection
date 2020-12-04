@@ -96,7 +96,8 @@ class bagFlipModule:
             self.bot_zone = self.BL
             self.top_zone = self.TL
             
-        rectangles = util.get_rectangles(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR, self.AREA)
+        mask = util.color_segmentation(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR)
+        rectangles = util.get_rectangles(mask, self.AREA)
         
         bag_msg = None
         if len(rectangles) > 0:
