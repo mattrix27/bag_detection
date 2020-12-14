@@ -16,12 +16,12 @@ from cv2 import RANSAC
 
 
 class ZEDOysterFlipper():
-    RGB_CAMERA_TOPIC   = rospy.get_param("zed_depth_flipper/rgb_camera_topic", 'nut')
-    DEPTH_CAMERA_TOPIC = rospy.get_param("zed_depth_flipper/depth_camera_topic", 'nut')
+    RGB_CAMERA_TOPIC   = rospy.get_param("zed_depth_flipper/rgb_camera_topic", "/zed/zed_node/stereo/image_rect_color")
+    DEPTH_CAMERA_TOPIC = rospy.get_param("zed_depth_flipper/depth_camera_topic", '/zed/zed_node/depth/depth_registered')
     FLIP_START_TOPIC   = rospy.get_param("zed_depth_flipper/flip_topic", 'nut')
     TEST_CAMERA_TOPIC  = rospy.get_param("zed_depth_flipper/test_path_camera_topic", 'nut')
 
-    DETECTION_MODEL    = rospy.get_param("zed_depth_flipper/detection_model_path", 'nut')
+    DETECTION_MODEL    = rospy.get_param("zed_depth_flipper/detection_model_path", "/home/oyster/TensorFlow/workspace/oyster_flipper/exported-models/my_model1/saved_model")
 
     GRAY_LOWER_RANGE   = rospy.get_param("zed_depth_flipper/gray_lower_range", (0,5,0))
     GRAY_UPPER_RANGE   = rospy.get_param("zed_depth_flipper/gray_upper_range", (100,10,100))

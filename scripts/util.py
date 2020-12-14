@@ -110,7 +110,7 @@ def get_tf2_detect_fn(path):
     return detect_fn
 
 
-def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5)
+def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5):
     image_np = np.array(image)
     input_tensor=tf.convert_to_tensor(image_np)
     input_tensor=input_tensor[tf.newaxis, ...]
