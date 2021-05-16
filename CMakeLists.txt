@@ -194,6 +194,12 @@ add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
 
+install(DIRECTORY
+  launch
+  params
+  scripts
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 #############
 ## Testing ##
 #############

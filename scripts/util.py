@@ -1,8 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import numpy as np
 import cv2
 import tensorflow as tf
+
+import sys
+sys.path.append("/home/oyster/Tensorflow/Monk_Object_Detection/13_tf_obj_2/lib/")
+from infer_detector_nano import Infer
 
 from bag_detection.msg import FlipPos, PathPos
 
@@ -11,11 +15,8 @@ def get_rectangles(mask, threshold_area):
     """
     Extract defined color from image and return rectangles coordinates of large enough contours on given side
     Input: 
-        cv_image: Image (BGR)
-        lower_range: 1x3 tuple representing lower HSV for target color
-        upper_range: 1x3 tuple representing upper HSV for target color
+        mask: Binary Image
         threshold_area: int
-        side: 1 for Right, -1 for Left
     Output:
         list of 1x4 tuples (x, y, w, h) of color blobs 
     """
@@ -109,7 +110,6 @@ def get_tf2_detect_fn(path):
     detect_fn=tf.saved_model.load(path)
     return detect_fn
 
-
 def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5):
     image_np = np.array(image)
     input_tensor=tf.convert_to_tensor(image_np)
@@ -139,6 +139,23 @@ def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5
             objects.append(detection)
 
     return objects
+
+
+def get_gtf();
+    gtf = Infer();
+    print("GTFF INITIALIZEDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+    gtf.set_dataset_params(class_list_file = '/home/oyster/Tensorflow/oyster_bag/classes.txt')
+    print("DATA SET PARAMMMS SETTTTTT")
+    gtf.set_model_params(exported_model_dir = '/home/oyster/Tensorflow/trt_fp16_dir')
+
+    return gtf
+
+def gtf_detect_objects(gtf, image_np, min_score_thres=0.5, width=1280, height=720):
+    input_tensor = tf.convert_to_tensor(image_np)
+    input_tensor = input_tensor[tf.newaxis, ...]
+    scores, bboxes, labels = gtf.infer_on_tensor(input_tensor, thresh=0.8);
+    
+    return bboxes
 
 
 def create_flip_pos_msg(top=False, bot=False):
