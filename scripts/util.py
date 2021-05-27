@@ -141,7 +141,7 @@ def detect_objects(detect_fn, image, width=1280, height=720, min_score_thres=0.5
     return objects
 
 
-def get_gtf();
+def get_gtf():
     gtf = Infer();
     print("GTFF INITIALIZEDDDDDDDDDDDDDDDDDDDDDDDDDDD")
     gtf.set_dataset_params(class_list_file = '/home/oyster/Tensorflow/oyster_bag/classes.txt')

@@ -1,4 +1,4 @@
-flip_camera_topic: "/flip_camera/image_bag_raw"
+flip_camera_topic: "/gopro_5/gopro_out"
 test_flip_camera_topic: "/flip_camera/test"
 
 path_rgb_camera_topic: "/zed/zed_node/stereo/image_rect_color"

@@ -82,34 +82,7 @@ class bagFlipModule:
         except CvBridgeError as e:
             print(e)
 
-        # hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-        # mask = cv2.inRange(hsv, np.array(self.LOWER_COLOR), np.array(self.UPPER_COLOR))
-        # red_only = cv2.bitwise_and(hsv,hsv,mask = mask)
-        
-        center=cv_image.shape[1]/2
-        if (self.SIDE > 0) ^ (self.MODE != 2):
-            cropped_image = cv_image[:,center:]
-            self.bot_zone = self.BR
-            self.top_zone = self.TR
-        else:
-            cropped_image = cv_image[:,:center]
-            self.bot_zone = self.BL
-            self.top_zone = self.TL
-            
-        mask = util.color_segmentation(cropped_image, self.LOWER_COLOR, self.UPPER_COLOR)
-        rectangles = util.get_rectangles(mask, self.AREA)
-        
         bag_msg = None
-        if len(rectangles) > 0:
-            bag_msg = self.get_bag_message(rectangles, cropped_image)
-     
-            if abs(bag_msg.bot_x) < ((self.bot_zone[1][0]-self.bot_zone[0][0])/2) and abs(bag_msg.bot_y) < ((self.bot_zone[1][1]-self.bot_zone[0][1])/2):
-                bag_msg.bot = True
-            if abs(bag_msg.top_x) < ((self.top_zone[1][0]-self.top_zone[0][0])/2) and abs(bag_msg.top_y) < ((self.top_zone[1][1]-self.top_zone[0][1])/2):
-                bag_msg.top = True
-            #print("AHHHH")
-            self.bag_pos_pub.publish(bag_msg)
-
 
         #FOR VIEWING
 
@@ -122,13 +95,8 @@ class bagFlipModule:
                 top_color = green
             if bag_msg.bot:
                 bot_color = green
-        cv2.rectangle(cropped_image, tuple(self.bot_zone[0]), tuple(self.bot_zone[1]), bot_color, 3)
-        cv2.rectangle(cropped_image, tuple(self.top_zone[0]), tuple(self.top_zone[1]), top_color, 3)
 
-        #cv2.rectangle(red_only, tuple(self.bot_zone[0]), tuple(self.bot_zone[1]), bot_color, 3)
-        #cv2.rectangle(red_only, tuple(self.top_zone[0]), tuple(self.top_zone[1]), top_color, 3)
-
-        self.image_pub.publish(self.bridge.cv2_to_imgmsg(cropped_image, encoding="passthrough"))
+        self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
 
 
     def update_mode(self, data):

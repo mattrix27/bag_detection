@@ -34,7 +34,7 @@ class bagPathModule:
         # Initialize your publishers and
         # subscribers here
         self.bag_rgb_camera_sub = message_filters.Subscriber(self.BAG_RGB_CAMERA_TOPIC, Image)
-        self.bag_depth_camera_sub = message_filters.Subscriber(self.BAG_RGB_CAMERA_TOPIC, Image)
+        self.bag_depth_camera_sub = message_filters.Subscriber(self.BAG_DEPTH_CAMERA_TOPIC, Image)
         self.ts = message_filters.TimeSynchronizer([self.bag_rgb_camera_sub, self.bag_depth_camera_sub], 10)
         self.ts.registerCallback(react_to_camera)
 
@@ -61,7 +61,7 @@ class bagPathModule:
         except CvBridgeError as e:
             print(e)
 	
-	bboxes = util.gtf_detect_objects(np.array(rgb_image))
+        bboxes = util.gtf_detect_objects(np.array(rgb_image))
 
         
         #self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
@@ -77,9 +77,6 @@ class bagPathModule:
         bag_msg.y = rect[1]
         return bag_msg
 
-
-    def makeHomography(self):
-        return 1, 1
         
 
 if __name__ == "__main__":
