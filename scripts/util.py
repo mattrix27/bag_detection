@@ -185,11 +185,11 @@ def directional_shear(closed, element, vertical=True, shearing_factor=50, shape=
 	return cv2.morphologyEx(horizontal, cv2.MORPH_CLOSE, element)
 
 
-def bag_rect_detection(img, dilation_size=9, dilation_shape=cv2.MORPH_RECT, thres1=100, thres2=200, aperture=1, shearing_factor=50, vertical=True, threshold_area = 0.025):
-	element = get_element(dilation_size, dilation_shape)
-	edges = canny(img, thres1, thres2)
-	closed = dilate_bag_row(edges, element)
-	closed = directional_shear(closed, element, True)
+def bag_rect_detection(img, vertical=True, threshold_area = 0.025, dilation_size=9, dilation_shape=cv2.MORPH_RECT, thres1=100, thres2=200, aperture=1, shearing_factor=50):
+    element = get_element(dilation_size, dilation_shape)
+    edges = canny(img, thres1, thres2)
+    closed = dilate_bag_row(edges, element)
+    closed = directional_shear(closed, element, True)
     c_rects = get_rectangles(closeH, threshold_area)
 
     return c_rects

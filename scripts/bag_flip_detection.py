@@ -29,6 +29,7 @@ class bagFlipModule:
     TL                = rospy.get_param("bag_flip_detection/tl")
     BR                = rospy.get_param("bag_flip_detection/br")
     BL                = rospy.get_param("bag_flip_detection/bl")
+    VERTICAL          = rospy.get_param("bag_flip_detection/vertical")
 
     WIDTH             = rospy.get_param("bag_flip_detection/width")
     HEIGHT            = rospy.get_param("bag_flip_detection/height")
@@ -84,8 +85,6 @@ class bagFlipModule:
 
         bag_msg = None
 
-        #FOR VIEWING
-
         top_color = (0,0,255)
         bot_color = (0,0,255)
         green = (0,255,0)
@@ -96,6 +95,12 @@ class bagFlipModule:
             if bag_msg.bot:
                 bot_color = green
 
+        c_rects = util.bag_rect_detection(cv_image, self.VERTICAL)
+        for rect in c_rects:
+            cv2.rectangle(img, (rect[0], rect[1]), (rect[0]+rect[2], rect[1]+rect[3]), (255,0,0), 10)
+
+        #FOR VIEWING
+        cv2.rectangle(cv_image, (100,100), (600,600), (0,0,255), 20)
         self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, encoding="passthrough"))
 
 
