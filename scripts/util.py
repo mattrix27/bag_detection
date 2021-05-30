@@ -159,9 +159,9 @@ def gtf_detect_objects(gtf, image_np, min_score_thres=0.5, width=1280, height=72
     return bboxes
 
 
-def get_element(dilation_size, dilation_shape):
-    return cv2.getStructuringElement(dilation_shape, (2 * dilatation_size + 1, 2 * dilatation_size + 1),
-                                   (dilatation_size, dilatation_size))
+def get_element(dilation_size, dilation_shape=cv2.MORPH_RECT):
+    return cv2.getStructuringElement(dilation_shape, (2 * dilation_size + 1, 2 * dilation_size + 1),
+                                   (dilation_size, dilation_size))
 
 def canny(img, thres1=100, thres2=200, aperture=1):
     return cv2.Canny(img, thres1, thres2, aperture)
@@ -171,7 +171,7 @@ def dilate_bag_row(edges, element):
     return cv2.morphologyEx(edges, cv2.MORPH_CLOSE, element)
 
 
-def directional_shear(closed, element, vertical=True, shearing_factor=50, shape=cv2.MORPH_RECT):
+def directional_shear(closed, element, vertical=1, shearing_factor=50, shape=cv2.MORPH_RECT):
     # dims = closed.shape[1]
     size = (closed.shape[1] // shearing_factor, 1)
 
@@ -182,15 +182,17 @@ def directional_shear(closed, element, vertical=True, shearing_factor=50, shape=
     structure = cv2.getStructuringElement(shape, size)
     closed = cv2.erode(closed, structure)
     closed = cv2.dilate(closed, structure)
-    return cv2.morphologyEx(horizontal, cv2.MORPH_CLOSE, element)
+    return cv2.morphologyEx(closed, cv2.MORPH_CLOSE, element)
 
 
-def bag_rect_detection(img, vertical=True, threshold_area = 0.025, dilation_size=9, dilation_shape=cv2.MORPH_RECT, thres1=100, thres2=200, aperture=1, shearing_factor=50):
+def bag_rect_detection(img, vertical=1, threshold_area_prop = 0.025, dilation_size=9, dilation_shape=cv2.MORPH_RECT, thres1=100, thres2=200, aperture=1, shearing_factor=50):
     element = get_element(dilation_size, dilation_shape)
-    edges = canny(img, thres1, thres2)
+    edges = canny(img, thres1, thres2, aperture)
     closed = dilate_bag_row(edges, element)
-    closed = directional_shear(closed, element, True)
-    c_rects = get_rectangles(closeH, threshold_area)
+    closed = directional_shear(closed, element, vertical, shearing_factor, dilation_shape)
+    h, w = img.shape[:2]
+    threshold_area = threshold_area_prop*h*w 
+    c_rects = get_rectangles(closed, threshold_area)
 
     return c_rects
 
