@@ -2,7 +2,7 @@ flip_camera_topic: "/gopro_5/gopro_out"
 test_flip_camera_topic: "/flip_camera/test"
 
 path_rgb_camera_topic: "/zed/zed_node/stereo/image_rect_color"
-path_depth_camera_topic: "/zed/zed_node/"
+path_depth_camera_topic: "/zed/zed_node/point_cloud/cloud_registered"
 test_path_camera_topic: "/path_camera/test"
 
 flip_pos_topic: "/boat_controller/flip/flip_pos"
